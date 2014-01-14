@@ -35,6 +35,8 @@ public class LandingPageBean {
         String metadata;
         String feedback;
         String title;
+        String parentMetadata;
+        String parentFeedback;
 
         public Example(String title, String metadata) {
             this.title = title;
@@ -45,6 +47,14 @@ public class LandingPageBean {
             this.title = title;
             this.metadata = metadata;
             this.feedback = feedback;
+        }
+
+        public Example(String title, String metadata, String feedback, String parentMetadata, String parentFeedback) {
+            this.title = title;
+            this.metadata = metadata;
+            this.feedback = feedback;
+            this.parentMetadata = parentMetadata;
+            this.parentFeedback = parentFeedback;
         }
 
         public String getFeedbackUrl() {
@@ -58,6 +68,22 @@ public class LandingPageBean {
         public String getTitle() {
             return this.title;
         }
+
+        public String getParentMetadata() {
+            return this.parentMetadata;
+        }
+
+        public void setParentMetadata(String parentMetadata) {
+            this.parentMetadata = parentMetadata;
+        }
+
+        public String getParentFeedback() {
+            return this.parentFeedback;
+        }
+
+        public void setParentFeedback(String parentFeedback) {
+            this.parentFeedback = parentFeedback;
+        }
     }
 
     @org.hibernate.validator.constraints.URL
@@ -68,7 +94,7 @@ public class LandingPageBean {
     private List<Example> examplesList = new ArrayList<>();
 
     public LandingPageBean() {
-        this.examplesList.add(new Example("DAB-Q",
+        this.examplesList.add(new Example("DAB-Q Example",
                                           "http://geoviqua.essi-lab.eu/dabq-demo/services/cswisoq?service=CSW&request=GetRecordById&id=mtri2an1ib&outputschema=http://www.geoviqua.org/QualityInformationModel/4.0&elementSetName=full"));
         this.examplesList.add(new Example("Online Feedback Server",
                                           null,
@@ -79,8 +105,14 @@ public class LandingPageBean {
         this.examplesList.add(new Example("Sensor Web label: service description",
                                           "http://geoviqua.dev.52north.org/SOS-Q/sos/kvp?service=SOS&request=GetCapabilities",
                                           null));
-        this.examplesList.add(new Example("GLC 2000",
-                                          "http://schemas.geoviqua.org/GVQ/4.0/example_documents/PQMs/GLC_2000_GVQ_raw.xml"));
+        this.examplesList.add(new Example("Sensor Web label: parent example description",
+                                          "http://geoviqua.dev.52north.org/SOS-Q/sos/kvp?service=SOS&version=2.0.0&request=DescribeSensor&procedure=http://geoviqua.dev.52north.org/procedures/ws2500&procedureDescriptionFormat=http://www.opengis.net/sensorML/1.0.1",
+                                          null,
+                                          "http://geoviqua.dev.52north.org/SOS-Q/sos/kvp?service=SOS&request=GetCapabilities",
+                                          null));
+
+        // this.examplesList.add(new Example("GLC 2000",
+        // "http://schemas.geoviqua.org/GVQ/4.0/example_documents/PQMs/GLC_2000_GVQ_raw.xml"));
         // this.examplesList.add(new Example("Feedback Use Case",
         // null,
         // "http://schemas.geoviqua.org/GVQ/4.0/example_documents/FeedbackUseCase_7_7_metadata.xml"));

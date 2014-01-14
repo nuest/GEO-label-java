@@ -28,20 +28,45 @@ public class LabelFacetTest {
 		LabelFacet facet = new LabelFacet() {
 		    //
 		};
-		
+
 		assertTrue(facet.getAvailability() == Availability.NA);
-		
+
 		facet.updateAvailability(Availability.NOT_AVAILABLE);
 		assertTrue(facet.getAvailability() == Availability.NOT_AVAILABLE);
-		
+
+        facet.updateAvailability(Availability.AVAILABLE_HIGHER);
+        assertTrue(facet.getAvailability() == Availability.AVAILABLE_HIGHER);
+
 		facet.updateAvailability(Availability.AVAILABLE);
 		assertTrue(facet.getAvailability() == Availability.AVAILABLE);
-		
+
 		facet.updateAvailability(Availability.NOT_AVAILABLE);
 		assertTrue(facet.getAvailability() == Availability.AVAILABLE);
-		
+
 		facet.updateAvailability(Availability.NA);
 		assertTrue(facet.getAvailability() == Availability.AVAILABLE);
+
+        facet.updateAvailability(Availability.AVAILABLE_HIGHER);
+        assertTrue(facet.getAvailability() == Availability.AVAILABLE);
+
+        facet = new LabelFacet() {
+            //
+        };
+        assertTrue(facet.getAvailability() == Availability.NA);
+
+        facet.updateAvailability(Availability.AVAILABLE);
+        assertTrue(facet.getAvailability() == Availability.AVAILABLE);
+
+        facet = new LabelFacet() {
+            //
+        };
+        assertTrue(facet.getAvailability() == Availability.NA);
+
+        facet.updateAvailability(Availability.AVAILABLE_HIGHER);
+        assertTrue(facet.getAvailability() == Availability.AVAILABLE_HIGHER);
+
+        facet.updateAvailability(Availability.NA);
+        assertTrue(facet.getAvailability() == Availability.AVAILABLE_HIGHER);
 	}
 
 }

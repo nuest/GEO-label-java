@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.n52.geolabel.commons.LabelFacet.Availability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -246,6 +247,50 @@ public class Label {
 
     public void setFeedbackUrl(URL feedbackUrl) {
         this.feedbackUrl = feedbackUrl;
+    }
+
+    public void parentUpdate(Label parent) {
+        if (parent.getCitationsFacet().getAvailability().compareTo(getCitationsFacet().getAvailability()) > 0) {
+            LabelFacet f = this.getCitationsFacet();
+            availableAtHigher(f, parent.getCitationsFacet());
+        }
+        if (parent.getExpertFeedbackFacet().getAvailability().compareTo(getExpertFeedbackFacet().getAvailability()) > 0) {
+            LabelFacet f = this.getExpertFeedbackFacet();
+            availableAtHigher(f, parent.getExpertFeedbackFacet());
+        }
+        if (parent.getProducerCommentsFacet().getAvailability().compareTo(getProducerCommentsFacet().getAvailability()) > 0) {
+            LabelFacet f = this.getProducerCommentsFacet();
+            availableAtHigher(f, parent.getProducerCommentsFacet());
+        }
+        if (parent.getProducerProfileFacet().getAvailability().compareTo(getProducerProfileFacet().getAvailability()) > 0) {
+            LabelFacet f = this.getProducerProfileFacet();
+            availableAtHigher(f, parent.getProducerProfileFacet());
+        }
+        if (parent.getQualityInformationFacet().getAvailability().compareTo(getQualityInformationFacet().getAvailability()) > 0) {
+            LabelFacet f = this.getQualityInformationFacet();
+            availableAtHigher(f, parent.getQualityInformationFacet());
+        }
+        if (parent.getProducerProfileFacet().getAvailability().compareTo(getProducerProfileFacet().getAvailability()) > 0) {
+            LabelFacet f = this.getProducerProfileFacet();
+            availableAtHigher(f, parent.getProducerCommentsFacet());
+        }
+        if (parent.getStandardsComplianceFacet().getAvailability().compareTo(getStandardsComplianceFacet().getAvailability()) > 0) {
+            LabelFacet f = this.getStandardsComplianceFacet();
+            availableAtHigher(f, parent.getStandardsComplianceFacet());
+        }
+        if (parent.getUserFeedbackFacet().getAvailability().compareTo(getUserFeedbackFacet().getAvailability()) > 0) {
+            LabelFacet f = this.getUserFeedbackFacet();
+            availableAtHigher(f, parent.getUserFeedbackFacet());
+        }
+    }
+
+    private LabelFacet availableAtHigher(LabelFacet f, LabelFacet parent) {
+        if (parent.getAvailability().equals(Availability.AVAILABLE)) {
+            f.setHref(parent.getHref());
+            f.setTitle(parent.getTitle());
+            f.updateAvailability(Availability.AVAILABLE_HIGHER);
+        }
+        return f;
     }
 
     @Override

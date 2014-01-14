@@ -33,7 +33,7 @@ public abstract class LabelFacet {
      * Mapping LML availability indicator
      */
     public enum Availability {
-        AVAILABLE(1), NOT_AVAILABLE(0), AVAILABLE_HIGHER(2), NA( -1);
+        NA( -1), NOT_AVAILABLE(0), AVAILABLE_HIGHER(2), AVAILABLE(1);
 
         protected int code;
 
@@ -63,6 +63,19 @@ public abstract class LabelFacet {
             }
         }
 
+        public int toLmlCode() {
+            switch (this) {
+            case NOT_AVAILABLE:
+                return 0;
+            case AVAILABLE:
+                return 1;
+            case AVAILABLE_HIGHER:
+                return 2;
+            default:
+                return Integer.MIN_VALUE;
+            }
+        }
+
         public static class AvailabilityAdapter extends XmlAdapter<Integer, Availability> {
 
             @Override
@@ -76,6 +89,7 @@ public abstract class LabelFacet {
             }
 
         }
+
     }
 
     @XmlElement
@@ -100,13 +114,21 @@ public abstract class LabelFacet {
     }
 
     /**
-     * Updating availability status. AVAILABLE beats all, NOT_AVAILABLE beats NA
+     * Updating availability status. AVAILABLE beats all, AVAILABLE_HIGHER beats NOT_AVAILABLE, NOT_AVAILABLE
+     * beats beats NA
      *
      * @param availabilityP
      */
     public void updateAvailability(Availability availabilityP) {
-        if (this.availability == Availability.NA || availabilityP == Availability.AVAILABLE)
+        if (this.availability == Availability.NOT_AVAILABLE && availabilityP == Availability.AVAILABLE_HIGHER)
             this.availability = availabilityP;
+        else if (this.availability == Availability.NA || availabilityP == Availability.AVAILABLE)
+            this.availability = availabilityP;
+    }
+
+    public void updateParentAvailability(Availability availabilityP) {
+        if (this.availability != Availability.AVAILABLE && availabilityP == Availability.AVAILABLE)
+            this.availability = Availability.AVAILABLE_HIGHER;
     }
 
     public String getTitle() {

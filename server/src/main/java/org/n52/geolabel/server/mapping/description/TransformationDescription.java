@@ -134,6 +134,10 @@ public class TransformationDescription {
     }
 
     public boolean updateGeoLabel(Label label, Document metadataXml) {
+        return updateGeoLabel(label, metadataXml, false);
+    }
+
+    public boolean updateGeoLabel(Label label, Document metadataXml, boolean isParent) {
         if (this.applicabilityExpression != null)
             try {
                 Object evaluationResult = this.applicabilityExpression.evaluate(metadataXml);
@@ -152,11 +156,12 @@ public class TransformationDescription {
                 log.error("Could not evaluate usability expression", e);
             }
 
-        log.debug("TransformationDescription {} is usable for this document, tested with path {}",
+        log.debug("TransformationDescription {} is usable for this document, tested with path {}, is parent {}",
                   this.name,
-                  this.applicabilityPath);
+                  this.applicabilityPath,
+                  Boolean.valueOf(isParent));
         for (FacetTransformationDescription< ? > facetDescription : this.facetDescriptions)
-            facetDescription.updateLabel(label, metadataXml);
+            facetDescription.updateLabel(label, metadataXml, isParent);
 
         return true;
     }

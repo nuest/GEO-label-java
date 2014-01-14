@@ -233,6 +233,10 @@ public class MetadataTransformer {
         this(transformationDescriptionLoader, 0, 0);
     }
 
+    public Label updateGeoLabel(InputStream xmlInputStream, Label label) throws IOException {
+        return updateGeoLabel(xmlInputStream, label, false);
+    }
+
     /**
      * Reads the supplied metadata XML stream and applies all loaded transformation descriptions to update a
      * {@link Label} instance
@@ -243,7 +247,7 @@ public class MetadataTransformer {
      * @throws IOException
      *         If reading XML stream or initial loading of transformation descriptions fails
      */
-    public Label updateGeoLabel(InputStream xmlInputStream, Label label) throws IOException {
+    public Label updateGeoLabel(InputStream xmlInputStream, Label label, boolean isParent) throws IOException {
         if (this.transformationDescriptions == null)
             readTransformationDescriptions();
 
@@ -255,14 +259,17 @@ public class MetadataTransformer {
             DocumentBuilder builder = domFactory.newDocumentBuilder();
             doc = builder.parse(xmlInputStream);
 
-            log.debug("Loaded metadata XML: {}, first child name: {}", doc, doc.getFirstChild().getNodeName());
+            log.debug("Loaded metadata XML: {}, first child name: {}, parent {}",
+                      doc,
+                      doc.getFirstChild().getNodeName(),
+                      Boolean.valueOf(isParent));
         }
         catch (Exception e) {
             throw new IOException("Could not parse supplied metadata xml", e);
         }
 
         for (TransformationDescription transformer : this.transformationDescriptions)
-            transformer.updateGeoLabel(label, doc);
+            transformer.updateGeoLabel(label, doc, isParent);
 
         return label;
     }
@@ -304,6 +311,13 @@ public class MetadataTransformer {
     }
 
     /**
+     * Returns a {@link Label} from metadata and/or feedback {@link URL} with parents. Results are cached.
+     */
+    public Label getLabel(URL metadataURL, URL feedbackURL, URL parentMetadataURL, URL parentFeedbackURL) throws IOException {
+        return getLabel(metadataURL, feedbackURL, parentMetadataURL, parentFeedbackURL, true);
+    }
+
+    /**
      * Returns a {@link Label} from metadata and/or feedback {@link URL}.
      */
     public Label getLabel(URL metadataURL, URL feedbackURL, boolean useCache) throws IOException {
@@ -320,6 +334,28 @@ public class MetadataTransformer {
             }
 
         return getLabel(labelUrlKey);
+    }
+
+    /**
+     * Returns a {@link Label} from metadata and/or feedback {@link URL}.
+     */
+    public Label getLabel(URL metadataURL,
+                          URL feedbackURL,
+                          URL parentMetadataURL,
+                          URL parentFeedbackURL,
+                          boolean useCache) throws IOException {
+        log.debug("Creating label for metadata {} and feedback {} with parents {} and {}",
+                  metadataURL,
+                  feedbackURL,
+                  parentMetadataURL,
+                  parentFeedbackURL);
+
+        Label parent = getLabel(parentMetadataURL, parentFeedbackURL, useCache);
+        Label child = getLabel(metadataURL, feedbackURL, useCache);
+
+        child.parentUpdate(parent);
+
+        return child;
     }
 
     public Set<LabelUrlKey> getCacheContent() {

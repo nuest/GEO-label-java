@@ -470,11 +470,15 @@ public abstract class FacetTransformationDescription<T extends LabelFacet> {
             });
     }
 
+    public T updateFacet(final T facet, Document metadataXml) throws XPathExpressionException {
+        return updateFacet(facet, metadataXml, false);
+    }
+
     /**
      * method does availability test, both the drilldown url and hoverover are set in subclasses since they
      * can vary.
      */
-    public T updateFacet(final T facet, Document metadataXml) throws XPathExpressionException {
+    public T updateFacet(final T facet, Document metadataXml, boolean isParent) throws XPathExpressionException {
         if (this.availabilityExpression == null) {
             log.warn("Availability expression is null, returning faced unchanged: {} for document {}",
                      facet,
@@ -505,7 +509,10 @@ public abstract class FacetTransformationDescription<T extends LabelFacet> {
 
         boolean hasTextNodesB = hasTextNodes.get();
         Availability availability = hasTextNodesB ? Availability.AVAILABLE : Availability.NOT_AVAILABLE;
-        facet.updateAvailability(availability);
+        if (isParent)
+            facet.updateParentAvailability(availability);
+        else
+            facet.updateAvailability(availability);
 
         updateHoverover(facet, metadataXml);
 
@@ -513,14 +520,21 @@ public abstract class FacetTransformationDescription<T extends LabelFacet> {
     }
 
     public Label updateLabel(Label label, Document metadataXml) {
+        return updateLabel(label, metadataXml, false);
+    }
+
+    public Label updateLabel(Label label, Document metadataXml, boolean isParent) {
         // must be set for the subclasses to use:
         this.originalMetadataUrl = label.getMetadataUrl();
         this.originalFeedbackUrl = label.getFeedbackUrl();
 
         try {
             T affectedF = getAffectedFacet(label);
-            T updatedFacet = updateFacet(affectedF, metadataXml);
-            log.debug("Updated facet: {} \n\t\tfor label: {}", updatedFacet, label);
+            T updatedFacet = updateFacet(affectedF, metadataXml, isParent);
+            log.debug("Updated facet: {} \n\t\tfor label: {}, as parent {}",
+                      updatedFacet,
+                      label,
+                      Boolean.valueOf(isParent));
             return label;
         }
         catch (XPathExpressionException e) {
